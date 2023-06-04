@@ -19,7 +19,7 @@ func Route(e *echo.Echo) {
 	// Role admin
 	RouteAdmin := api.Group("/admin")
 	RouteAdmin.POST("/login", controller.LoginAdmin)
-	RouteAdmin.Use(middleware.JWTMiddleware, middleware.AdminMiddleware)
+	RouteAdmin.Use(middleware.JWTMiddleware)
 
 	RouteAdmin.GET("/cashier", admin.GetCashier)
 	RouteAdmin.POST("/cashier", admin.AddCashier)
@@ -31,4 +31,10 @@ func Route(e *echo.Echo) {
 	RouteAdmin.POST("/membership/point", admin.AddPoint)
 	RouteAdmin.PUT("/membership/:id", admin.EditMembership)
 	RouteAdmin.DELETE("/membership/:id", admin.DeleteMembership)
+
+	// Role cashier routes
+	RouteCashier.GET("/cashier", admin.GetCashier)
+	RouteCashier.GET("/membership", admin.GetMembership)
+	RouteCashier.POST("/membership", admin.AddMembership)
+	RouteCashier.POST("/membership/point", admin.AddPoint)
 }
