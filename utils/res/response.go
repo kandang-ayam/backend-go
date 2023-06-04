@@ -1,13 +1,14 @@
 package res
 
+
 type FormatApi struct {
-	Meta Meta        `json:"meta"`
-	Data interface{} `json:"data"`
+	Meta      Meta       `json:"meta"`
+	Data      interface{} `json:"data"`
 }
 
 type FormatApiPage struct {
-	Meta       Meta        `json:"meta"`
-	Data       interface{} `json:"data"`
+	Meta      Meta       `json:"meta"`
+	Data      interface{} `json:"data"`
 	Pagination Pagination  `json:"pagination,omitempty"`
 }
 
@@ -24,18 +25,6 @@ type Pagination struct {
 	TotalPages int `json:"total_pages"`
 }
 
-func Response(code int, status, message string, data interface{}) FormatApi {
-	Meta := Meta{
-		Code:    code,
-		Status:  status,
-		Message: message,
-	}
-
-	return FormatApi{
-		Meta: Meta,
-		Data: data,
-	}
-}
 
 func Responsedata(code int, status, message string, data interface{}, pages Pagination) FormatApiPage {
 	meta := Meta{
@@ -52,8 +41,21 @@ func Responsedata(code int, status, message string, data interface{}, pages Pagi
 	}
 
 	return FormatApiPage{
-		Meta:       meta,
-		Data:       data,
+		Meta:      meta,
+		Data:      data,
 		Pagination: pagination,
+	}
+}
+
+func Response(code int, status, message string, data interface{}) FormatApi {
+	Meta := Meta{
+		Code:    code,
+		Status:  status,
+		Message: message,
+	}
+
+	return FormatApi{
+		Meta: Meta,
+		Data: data,
 	}
 }

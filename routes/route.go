@@ -32,6 +32,9 @@ func Route(e *echo.Echo) {
 		RouteAdmin.POST("/membership/point", admin.AddPoint)
 		RouteAdmin.PUT("/membership/:id", admin.EditMembership)
 		RouteAdmin.DELETE("/membership/:id", admin.DeleteMembership)
+		
+		RouteAdmin.GET("/orders", admin.IndexOrder)
+		RouteAdmin.GET("/orders/:id", admin.DetailOrder)
 	}
 
 }
