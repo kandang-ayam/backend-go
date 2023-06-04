@@ -15,7 +15,10 @@ func Route(e *echo.Echo) {
 	RouteCashier.POST("/login", controller.LoginCashier)
 	RouteCashier.Use(middleware.JWTMiddleware)
 	{
-
+		e.GET("/order", controller.SearchItems)
+		e.GET("/order/search", controller.SearchItemsByName)
+		e.GET("/order/member", controller.SearchMembershipByName)
+		e.POST("/checkout", controller.RequestPayment)
 	}
 
 	RouteAdmin := api.Group("/admin")
@@ -32,9 +35,20 @@ func Route(e *echo.Echo) {
 		RouteAdmin.POST("/membership/point", admin.AddPoint)
 		RouteAdmin.PUT("/membership/:id", admin.EditMembership)
 		RouteAdmin.DELETE("/membership/:id", admin.DeleteMembership)
-		
+
 		RouteAdmin.GET("/orders", admin.IndexOrder)
 		RouteAdmin.GET("/orders/:id", admin.DetailOrder)
+
+		RouteAdmin.GET("/product", admin.IndexProducts)
+		RouteAdmin.GET("/product/:id", admin.DetailProducts)
+		RouteAdmin.POST("/product/create", admin.CreateProducts)
+		RouteAdmin.DELETE("/product/delete", admin.DeleteProducts)
+		RouteAdmin.PUT("/product/update", admin.UpdateProducts)
+
+		RouteAdmin.GET("/category", admin.IndexCategory)
+		RouteAdmin.POST("/category/create", admin.CreateCategory)
+		RouteAdmin.DELETE("/category/delete", admin.DeleteCategory)
 	}
 
+	e.Static("/images", "./images")
 }
