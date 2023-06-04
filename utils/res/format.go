@@ -44,7 +44,7 @@ func TransformResponse(order model.Order) SetOrderResponse {
 	}
 
 	setResponse := SetOrderResponse{
-		OrderID:     order.OrderID,
+		OrderID:     order.OrderCode,
 		OrderOption: order.OrderOption,
 		Name:        order.Name,
 		NumberTable: order.NumberTable,
@@ -74,7 +74,7 @@ func TransformResponseDataOrder(order model.Order) SetOrderResponse {
 	}
 
 	setResponse := SetOrderResponse{
-		OrderID:     order.OrderID,
+		OrderID:     order.OrderCode,
 		OrderOption: order.OrderOption,
 		CreatedAt:   order.CreatedAt,
 		Status:      order.Transaction.Status,

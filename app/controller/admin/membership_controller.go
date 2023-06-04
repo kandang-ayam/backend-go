@@ -59,13 +59,18 @@ func AddMembership(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	birthDay, err := time.Parse("2006-01-02", request.BirthDay)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid BirthDay format")
+	}
+
 	memberCode := fmt.Sprintf("%s-%d", gen.RandomStrGen(), gen.RandomIntGen())
 	membership := model.Membership{
 		MemberCode: memberCode,
 		Name:       request.Name,
 		Email:      request.Email,
 		Phone:      request.Phone,
-		BirthDay:   request.BirthDay,
+		BirthDay:   birthDay,
 		Level:      "Bronze",
 		Point:      0,
 		CreatedAt:  time.Now(),
@@ -141,12 +146,17 @@ func EditMembership(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	birthDay, err := time.Parse("2006-01-02", request.BirthDay)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid BirthDay format")
+	}
+
 	membership := model.Membership{
 		ID:       intID,
 		Name:     request.Name,
 		Email:    request.Email,
 		Phone:    request.Phone,
-		BirthDay: request.BirthDay,
+		BirthDay: birthDay,
 	}
 
 	if err := config.Db.Updates(&membership).Error; err != nil {

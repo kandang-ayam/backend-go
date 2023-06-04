@@ -132,7 +132,7 @@ func RequestPayment(c echo.Context) error {
 	}
 
 	// Transform response
-	transformedOrder := res.TransformResponse(order)
+	transformedOrder := res.TransformOrderResponse(order)
 	response := res.Response(http.StatusCreated, "success", "success create order", transformedOrder)
 	return c.JSON(http.StatusCreated, response)
 }
@@ -223,7 +223,7 @@ func RequestPayment(c echo.Context) error {
 //	}
 //
 //	// Transform response
-//	transformedOrder := res.TransformResponse(order)
+//	transformedOrder := res.TransformOrderResponse(order)
 //	response := res.Response(http.StatusCreated, "success", "success create order", transformedOrder)
 //	return c.JSON(http.StatusCreated, response)
 //}

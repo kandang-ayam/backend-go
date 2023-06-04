@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type SetOrderResponse struct {
+type SetCashierOrderResponse struct {
 	ID          int                    `json:"order_id"`
 	OrderCode   string                 `json:"order_code"`
 	Name        string                 `json:"name"`
@@ -13,12 +13,12 @@ type SetOrderResponse struct {
 	NumberTable int                    `json:"number_table"`
 	Service     int                    `json:"service"`
 	Subtotal    int                    `json:"subtotal"`
-	GrandTotal  int                    `json:"grand_total"`
-	Items       []SetItemOrderResponse `json:"items"`
-	Transaction SetTransactionResponse `json:"transaction"`
+	GrandTotal  int                     `json:"grand_total"`
+	Items       []SetItemOutputResponse `json:"items"`
+	Transaction SetTransactionResponse  `json:"transaction"`
 }
 
-type SetItemOrderResponse struct {
+type SetItemOutputResponse struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Quantity int    `json:"quantity"`
@@ -32,12 +32,12 @@ type SetTransactionResponse struct {
 	PaymentMethod string `json:"payment_method"`
 }
 
-func TransformResponse(order model.Order) SetOrderResponse {
-	setItems := make([]SetItemOrderResponse, len(order.Items))
+func TransformOrderResponse(order model.Order) SetCashierOrderResponse {
+	setItems := make([]SetItemOutputResponse, len(order.Items))
 	subtotal := 0
 
 	for i, item := range order.Items {
-		setItems[i] = SetItemOrderResponse{
+		setItems[i] = SetItemOutputResponse{
 			ID:       item.ProductID,
 			Name:     item.Products.Name,
 			Quantity: item.Quantity,
@@ -54,7 +54,7 @@ func TransformResponse(order model.Order) SetOrderResponse {
 		PaymentMethod: order.Transaction.Payment,
 	}
 
-	setResponse := SetOrderResponse{
+	setResponse := SetCashierOrderResponse{
 		ID:          order.ID,
 		OrderCode:   order.OrderCode,
 		Name:        order.Name,
