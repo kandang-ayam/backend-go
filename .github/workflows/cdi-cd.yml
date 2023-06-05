@@ -33,9 +33,9 @@ jobs:
    
        
       - name: Install doctl
-        uses: digitalocean/action-doctl@v2
         env:
            token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        uses: digitalocean/action-doctl@v2
       
     
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
