@@ -1,74 +1,41 @@
 name: Digital Ocean
 
-# 1
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the master branch
   push:
-    branches: [ features/membership ]
+    branches:
+      - features/membership
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Image version'
-        required: true
-#2
 env:
   REGISTRY: "registry.digitalocean.com/private-registry"
   IMAGE_NAME: "backend-go"
-  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-  HOST: ${{ secrets.HOST }}
 
-#3
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repo 
+      - name: Checkout the repo
         uses: actions/checkout@v2
-        
-      - name: Build container image
-        run: docker build -t $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
-   
-       
-      - name: Install doctl
-        env:
-           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-        uses: digitalocean/action-doctl@v2
-      
-    
-      - name: Log in to DigitalOcean Container Registry with short-lived credentials
-        run: doctl registry login --expiry-seconds 600
-      
-      - name: Remove all old images
-        run: if [ ! -z "$(doctl registry repository list | grep "$(echo $IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $IMAGE_NAME) $(doctl registry repository list-tags $(echo $IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
 
+      - name: Create Docker config file
+        run: echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > $HOME/.docker/config.json
+   
+      - name: Build container image
+        run: docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
+   
       - name: Push image to DigitalOcean Container Registry
-        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
         
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
     
     steps:
-      - name: Deploy to Digital Ocean droplet via SSH action
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          envs: IMAGE_NAME,REGISTRY,{{ secrets.DIGITALOCEAN_ACCESS_TOKEN }},GITHUB_SHA
-          script: |
-            # Login to registry
-            docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
-            # Stop running container
-            docker stop $(echo $IMAGE_NAME)
-            # Remove old container
-            docker rm $(echo $IMAGE_NAME)
-            # Run a new container from a new image
-            docker run -d \
-            --restart always \
-            --name $(echo $IMAGE_NAME) \
-            $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+      - name: Install doctl
+        run: |
+          curl -sL https://github.com/digitalocean/doctl/releases/latest/download/doctl-$(uname -s)-$(uname -m).tar.gz | tar -xzv
+          sudo mv doctl /usr/local/bin
+          
+      - name: Deploy to DigitalOcean Droplet
+        run: |
+          doctl auth init --context github-actions --access-token "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}"
+          doctl compute droplet create droplet-name --image $REGISTRY/$IMAGE_NAME:${{ github.sha }} --size droplet-size --region droplet-region --ssh-keys droplet-ssh-key --wait
