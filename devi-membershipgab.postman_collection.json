@@ -18,11 +18,11 @@
 					}
 				],
 				"url": {
-					"raw": "localhost:8080/membership?page=1",
+					"raw": "localhost:8000/membership?page=1",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8000",
 					"path": [
 						"membership"
 					],
